@@ -19,4 +19,3 @@ def write_cape_mu(t1, t2, file):
 	for i in range(6 + t1_months, len(ie[0]) - t2_months - 1):
 		year = int(ie[0][i])
 		w.writerow([datetime.datetime(year, int(100*(ie[0][i] - year) + 1/2), 1), get_cape(i, t1_months), get_mu(i, t2, t2_months)])
-write_pearsonr('test2.csv')
