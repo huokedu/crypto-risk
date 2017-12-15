@@ -20,7 +20,7 @@ def volatility(file, dpy = 365):
 			for j in [1, 2, 3, 4, 8, 9, 10, 11]: x[j] = float(x[j]) if x[j] else None
 		n, K, delta, abs_diff = len(term[i]) - 1, [strike(x[0]) for x in term[i]], exp[i] - datetime.datetime.now(), [abs(x[3] + x[4] - x[10] - x[11])/2 for x in term[i] if all([x[3], x[4], x[10], x[11]])]
 		t += [(delta.days + delta.seconds/86400)/dpy]
-		delta_K, growth, minimum = [K[1] - K[0]] + [(K[j + 1] - K[j - 1])/2 for j in range(1, n)] + [K[n] - K[n - 1]], math.exp(float(re.findall('<td class=\"text_view_data\">(.+?)</td>', ''.join([x.decode('utf-8').strip() for x in urllib.request.urlopen('https://www.treasury.gov/resource-center/data-chart-center/interest-rates/Pages/TextView.aspx?data=yield')]))[1])/100*t[i]), min(abs_diff)
+		delta_K, growth, minimum = [K[1] - K[0]] + [(K[j + 1] - K[j - 1])/2 for j in range(1, n)] + [K[n] - K[n - 1]], math.exp(float(re.findall('<td class=\"text_view_data\">(.+?)</td>', ''.join([x.decode('utf-8').strip() for x in urllib.request.urlopen('https://www.treasury.gov/resource-center/data-chart-center/interest-rates/Pages/TextView.aspx?data=yield')]))[-10])/100*t[i]), min(abs_diff)
 		m, Q = abs_diff.index(minimum), []
 		F = K[m] + growth*minimum
 		K0 = max([x for x in K if x < F])
