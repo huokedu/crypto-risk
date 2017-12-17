@@ -14,12 +14,6 @@ def kelly(target, mu, sigma, R, ef = None):
 	return (sum(numpy.multiply(ef[0], mu)) - float(re.findall('<td class=\"text_view_data\">(.+?)</td>', ''.join([x.decode('utf-8').strip() for x in urllib.request.urlopen('https://www.treasury.gov/resource-center/data-chart-center/interest-rates/Pages/TextView.aspx?data=yield')]))[-10])/100)/ef[1]
 def kelly_opt(target, mu, sigma, R): return (kelly(target, mu, sigma, R) - 1)**2
 def evaluate(mu, sigma, R):
-	geo_mean = functools.reduce(operator.mul, mu)**(1/len(mu))
-	i = math.exp(math.sqrt(sum([math.log(x/geo_mean)**2 for x in mu])/len(mu)))/100
-	target, target_f = min(mu) + i, []
-	while target < max(mu):
-		target_f += [(target, (kelly(target, mu, sigma, R) - 1)**2)]
-		target += i
-	portfolio_mu = optimize.minimize(kelly_opt, min(target_f, key = operator.itemgetter(1))[0], args = (mu, sigma, R), bounds = [(min(mu), max(mu))]).x
+	portfolio_mu = optimize.minimize(kelly_opt, min([(target, (kelly(target, mu, sigma, R) - 1)**2) for target in numpy.geomspace(min(mu), max(mu))], key = operator.itemgetter(1))[0], args = (mu, sigma, R), bounds = [(min(mu), max(mu))]).x
 	ef = eff_front(portfolio_mu, mu, sigma, R)
 	return {'weight': min(1, kelly(portfolio_mu, mu, sigma, R, ef))*(ef[0]), 'portfolio expected return': portfolio_mu[0], 'portfolio volatility': math.sqrt(ef[1])}
