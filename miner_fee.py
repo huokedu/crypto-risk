@@ -1,7 +1,7 @@
 import urllib.request, json
 def read_json(url): return json.loads(urllib.request.urlopen(urllib.request.Request(url)).read().decode('utf-8'))
-miner_fee, price, miner_fee_usd = {r['pair'].split('_')[1]: r['minerFee'] for r in read_json('https://shapeshift.io/rate')}, {cmc['symbol']: float(cmc['price_usd']) for cmc in read_json('https://api.coinmarketcap.com/v1/ticker/')}, {}
-i = 0
-for mf in miner_fee:
-	try: miner_fee_usd[mf] = miner_fee[mf]*price[mf]
-	except KeyError: continue
+data = read_json('https://shapeshift.io/rate')
+miner_fee = {x['pair'].split('_')[1]: x['minerFee'] for x in data}
+rate = {x['pair']: float(x['rate']) for x in data}
+mf_btc = {x: miner_fee[x]*rate[x + '_BTC'] for x in miner_fee if x != 'BTC'}
+mf_btc['BTC'] = miner_fee['BTC']
